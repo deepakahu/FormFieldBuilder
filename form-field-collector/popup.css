@@ -1,0 +1,74 @@
+/* popup.css (FINAL TABBED VERSION) */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    width: 320px; /* A bit wider for the new content */
+    color: #333;
+}
+.container { padding: 0; }
+h1 { font-size: 16px; margin: 0; text-align: center; padding-bottom: 10px; }
+
+/* Tab Styles */
+.tab-header {
+    display: flex;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+}
+.tab-link {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 12px 16px;
+    transition: 0.3s;
+    font-size: 15px;
+    flex-grow: 1;
+    color: #555;
+}
+.tab-link:hover { background-color: #ddd; }
+.tab-link.active {
+    background-color: #fff;
+    border-bottom: 2px solid #0078D4;
+    color: #000;
+    font-weight: bold;
+}
+.tab-content {
+    display: none;
+    padding: 15px;
+    border-top: none;
+}
+.tab-content.active { display: block; }
+
+/* Status Tab Styles */
+#status-display p { background-color: #f1f1f1; border-radius: 4px; padding: 8px; font-size: 14px; text-align: center; margin: 0; }
+hr { border: none; border-top: 1px solid #eee; margin: 15px 0; }
+
+/* Notes Tab Styles */
+.notes-controls { display: flex; align-items: center; margin-bottom: 10px; }
+.notes-controls label { margin-right: 10px; }
+.notes-controls select { flex-grow: 1; padding: 5px; }
+#stored-notes-textarea {
+    width: 100%;
+    height: 200px;
+    box-sizing: border-box;
+    font-family: monospace;
+    font-size: 13px;
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+/* Action Button Styles */
+.actions { text-align: center; }
+.actions button {
+    background-color: #0078D4;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+}
+.actions button:hover { background-color: #005a9e; }
+.actions button:disabled { background-color: #a0a0a0; cursor: not-allowed; }

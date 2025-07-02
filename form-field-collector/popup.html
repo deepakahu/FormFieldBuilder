@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Collector Control</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="tab-header">
+            <button class="tab-link active" data-tab="status-tab">Status</button>
+            <button class="tab-link" data-tab="notes-tab">Stored Notes</button>
+        </div>
+
+        <!-- Status Tab Content -->
+        <div id="status-tab" class="tab-content active">
+            <h1>Xero Form Collector</h1>
+            <div id="status-display">
+                <p>Loading status...</p>
+            </div>
+            <hr>
+            <div class="actions">
+                <button id="toggle-sidebar-btn">Toggle Sidebar</button>
+            </div>
+        </div>
+
+        <!-- Stored Notes Tab Content -->
+        <div id="notes-tab" class="tab-content">
+            <h1>Stored Notes</h1>
+            <div class="notes-controls">
+                <label for="client-select">Select a Client:</label>
+                <select id="client-select">
+                    <option value="">-- No clients found --</option>
+                </select>
+            </div>
+            <textarea id="stored-notes-textarea" readonly placeholder="Select a client to view their notes."></textarea>
+            <div class="actions">
+                <button id="copy-notes-btn" disabled>Copy Notes</button>
+            </div>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>

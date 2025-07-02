@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Xero Tax Return Form",
+    "matchPatterns": ["https://autax.xero.com/*"],
+    "selectors": {
+      "pageTitle": "span.dfPgT.xui-text-emphasis",
+      "fieldLabel": "span.questionText, [data-type='questionheading']",
+      "fieldContainer": ".question.LPitW",
+      "valueContainer": ".Eo7X2",
+      "clientName": "a.xui-text-decoration-none.xui-margin-left-large"
+    },
+    "defaultQuestions": {
+      "default": ["Please verify this information."],
+      "Main salary and wage occupation": [
+        "Is this the primary occupation for the client?",
+        "Please confirm if this occupation code is correct."
+      ],
+      "Salary or wages": [
+        "Does this amount match the final payslip/income statement?",
+        "Please provide the income statement for this amount."
+      ],
+      "Payer's name": [
+        "Is this the correct legal name of the employer?",
+        "Please provide the ABN for this payer."
+      ]
+    }
+  },
+  {
+    "name": "Xero Practice Manager (Example)",
+    "matchPatterns": ["https://practicemanager.xero.com/*"],
+    "selectors": {
+      "pageTitle": ".title",
+      "fieldLabel": ".job-info-label",
+      "fieldContainer": ".job-info-row",
+      "valueContainer": ".job-info-value",
+      "clientName": ".client-name-header"
+    }
+  },
+  {
+    "name": "Disabled",
+    "matchPatterns": [],
+    "selectors": {}
+  }
+]

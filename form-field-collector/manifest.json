@@ -1,0 +1,52 @@
+{
+  "manifest_version": 3,
+  "name": "Xero Form Note-Taker",
+  "version": "2.0.0",
+  "description": "Your essential note-taking assistant for Xero. Instantly flag & collect form fields for client review.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://*.xero.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Xero Form Note-Taker"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.xero.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "style.css",
+        "sidebar.css"
+      ],
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "sidebar.html",
+        "sites.json"
+      ],
+      "matches": [
+        "https://*.xero.com/*"
+      ]
+    }
+  ]
+}

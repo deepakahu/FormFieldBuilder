@@ -29,6 +29,34 @@ document.addEventListener("DOMContentLoaded", () => {
   async function initStatusTab() {
     log("Status Tab: Initializing...");
     try {
+
+        // --- This new helper function will handle the notification logic ---
+        async function handlePopupUpdateNotification() {
+            const { activeProfileIndex = 0 } = await chrome.storage.sync.get('activeProfileIndex');
+            const siteConfigs = await fetch(chrome.runtime.getURL('sites.json')).then(res => res.json());
+            const activeConfig = siteConfigs[activeProfileIndex];
+
+            const { installDate } = await chrome.storage.local.get('installDate');
+
+            if (!activeConfig || activeConfig.license !== "Free" || !installDate) {
+                return; // Exit if not a free license or no install date
+            }
+
+            const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+            if ((Date.now() - installDate) > thirtyDaysInMillis) {
+                const extensionId = chrome.runtime.id;
+                const updateUrl = `https://chrome.google.com/webstore/detail/${extensionId}`;
+                const message = `Please <a href="${updateUrl}" target="_blank">update your extension</a> for bug fixes and latest update.`;
+
+                const popupNotification = document.getElementById('ffc-popup-notification');
+                if (popupNotification) {
+                    popupNotification.innerHTML = message;
+                    popupNotification.style.display = 'block'; // Make it visible
+                }
+            }
+        }
+
+
       const configs = await fetch(chrome.runtime.getURL("sites.json")).then(
         (res) => res.json()
       );
@@ -40,6 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       const settings = await chrome.storage.sync.get({ activeProfileIndex: 0 });
       profileSelect.value = settings.activeProfileIndex;
+
+      handlePopupUpdateNotification();
+
       log("Status Tab: Profiles loaded and selected.", settings);
     } catch (e) {
       console.error("XFC ERROR: Failed to init status tab", e);

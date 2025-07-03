@@ -1,8 +1,16 @@
 // background.js
 
 // This function runs only once, when the extension is first installed or updated.
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
   
+  // Check if the reason for this event is a fresh 'install'.
+  if (details.reason === 'install') {
+    // This is a new user. Store the installation timestamp.
+    const installDate = Date.now(); // Get the current time in milliseconds
+    chrome.storage.local.set({ installDate: installDate });
+    console.log(`Xero Form Collector installed on: ${new Date(installDate).toLocaleDateString()}`);
+  }
+
   // We use chrome.storage.sync.get to check if our settings already exist.
   // This prevents us from overwriting user's custom settings on every update.
   chrome.storage.sync.get(

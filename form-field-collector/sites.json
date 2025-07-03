@@ -2,8 +2,9 @@
   {
     "name": "Xero Tax Return Form (Unified)",
     "matchPatterns": [
-      "https://autax.xero.com/Tax/Return/*"
+      "https://*.xero.com/*"
     ],
+    "license": "Free",
     "selectors": {
       "pageTitle": ".page-title, span.dfPgT.xui-text-emphasis",
       "fieldLabel": ".q-text, .questionText, [data-type='questionheading']",

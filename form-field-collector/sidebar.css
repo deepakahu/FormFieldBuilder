@@ -56,3 +56,21 @@
 .ffc-sidebar-footer button { padding: 8px 12px; border-radius: 5px; border: 1px solid transparent; cursor: pointer; font-weight: 500; }
 .ffc-primary-btn { background-color: #27ae60; color: white; border-color: #229954; }
 .ffc-danger-btn { background-color: #c0392b; color: white; border-color: #a93226; }
+
+/* Add to sidebar.css */
+
+.ffc-notification-area {
+    padding: 10px 15px;
+    background-color: #e9f5ff;
+    border-bottom: 1px solid #bce8f1;
+    color: #31708f;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.ffc-notification-area a {
+    font-weight: bold;
+    color: #005a9e;
+    text-decoration: underline;
+}

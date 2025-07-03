@@ -19,6 +19,7 @@ let activeConfig = null;
  */
 async function initialize() {
   log("---- INITIALIZATION START ----");
+  
   // Load sync settings first
   const settings = await chrome.storage.sync.get({
     masterQuestionList: {},
@@ -104,7 +105,7 @@ async function initialize() {
   log("7. Injecting sidebar...");
   await injectSidebar();
   log("Sidebar injection complete.");
-
+  
   log("8. Setting up listeners...");
   setupListeners();
   log("Listeners setup complete.");
@@ -112,6 +113,10 @@ async function initialize() {
   log("9. Initial scan for fields to add buttons...");
   processPageForMissingButtons();
   log("---- INITIALIZATION COMPLETE ----");
+
+  // Check if extension is not more than 30 days old
+  await checkForUpdateNotification();
+
 }
 
 function setupListeners() {
@@ -501,6 +506,57 @@ new MutationObserver(() => {
     }, 500); // 500ms delay is usually a safe bet
   }
 }).observe(document, { subtree: true, childList: true });
+
+async function checkForUpdateNotification() {
+  // 1. Check if the profile has a "Free" license
+  if (activeConfig.license !== "Free") {
+    return;
+  }
+
+  // 2. Get the installation date from storage
+  const data = await chrome.storage.local.get('installDate');
+  if (data.installDate) {
+    
+    // 3. Calculate the difference in days
+    const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+    const timeSinceInstall = Date.now() - data.installDate;
+
+    if (timeSinceInstall < thirtyDaysInMillis) {
+      // It has not been 30 days yet. Do nothing.
+      return;
+    }
+  }
+  
+  const extensionId = chrome.runtime.id;
+  // Let's call it "re-install" as requested, but "update" is clearer for users.
+  // We'll use "update" in the user-facing text.
+  const updateUrl = `https://chrome.google.com/webstore/detail/${extensionId}`;
+
+  const message = `Please <a href="${updateUrl}" target="_blank">update the extension</a> for bug fixes and latest features.`;
+  
+  
+  // Show notification in the sidebar
+  const sidebarNotification = document.getElementById('ffc-sidebar-notification');
+  if (sidebarNotification) {
+    sidebarNotification.innerHTML = message;
+    sidebarNotification.style.display = 'block';
+  }
+
+
+  // 4. If it's been over 30 days, show the banner
+  if (document.querySelector('.xfc-update-banner')) {
+    return; // Banner already exists
+  } else {
+    const banner = document.createElement('div');
+    banner.className = 'xfc-update-banner';
+    banner.innerHTML = `
+      Thank you for using the Xero Form Collector! To ensure you have the latest features and bug fixes, please update the extension.
+      <a href="${updateUrl}" target="_blank" rel="noopener noreferrer">Update Now</a>
+    `;
+
+    document.body.prepend(banner);
+  }
+}
 
 
 // --- Start the entire process ---

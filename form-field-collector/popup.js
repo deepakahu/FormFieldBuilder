@@ -1,116 +1,161 @@
-// popup.js (FINAL, STABLE VERSION)
-document.addEventListener('DOMContentLoaded', () => {
+// popup.js (DEBUG VERSION)
+const log = (...args) => console.log("XFC DEBUG [Popup]:", ...args);
 
-    // --- Tab Switching Logic ---
-    const tabLinks = document.querySelectorAll('.tab-link');
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            tabLinks.forEach(l => l.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            const tabId = link.dataset.tab;
-            link.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
-        });
+document.addEventListener("DOMContentLoaded", () => {
+  log("---- POPUP OPENED ----");
+  // --- Tab Switching Logic ---
+  const tabLinks = document.querySelectorAll(".tab-link");
+  const tabContents = document.querySelectorAll(".tab-content");
+  tabLinks.forEach((link) => {
+    link.addEventListener("click", () => {
+      tabLinks.forEach((l) => l.classList.remove("active"));
+      tabContents.forEach((c) => c.classList.remove("active"));
+      link.classList.add("active");
+      document.getElementById(link.dataset.tab).classList.add("active");
+      log(`Switched to tab: ${link.dataset.tab}`);
     });
+  });
 
-    // --- "Status" Tab Logic ---
-    const statusDisplay = document.getElementById('status-display');
-    const toggleBtn = document.getElementById('toggle-sidebar-btn');
+  // --- Links to Options Page ---
+  document.getElementById("options-link").onclick = () =>
+    chrome.runtime.openOptionsPage();
+  document.getElementById("options-link-2").onclick = () =>
+    chrome.runtime.openOptionsPage();
 
-    async function updateStatus() {
-        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (activeTab && activeTab.url && activeTab.url.includes('.xero.com')) {
-            statusDisplay.innerHTML = `<p>Active on this Xero page.</p>`;
-            toggleBtn.disabled = false;
-        } else {
-            statusDisplay.innerHTML = '<p>Inactive on this page.</p>';
-            toggleBtn.disabled = true;
-        }
+  // --- Tab 1: Status ---
+  const profileSelect = document.getElementById("profile-select");
+  const toggleBtn = document.getElementById("toggle-sidebar-btn");
+
+  async function initStatusTab() {
+    log("Status Tab: Initializing...");
+    try {
+      const configs = await fetch(chrome.runtime.getURL("sites.json")).then(
+        (res) => res.json()
+      );
+      configs.forEach((config, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = config.name;
+        profileSelect.appendChild(option);
+      });
+      const settings = await chrome.storage.sync.get({ activeProfileIndex: 0 });
+      profileSelect.value = settings.activeProfileIndex;
+      log("Status Tab: Profiles loaded and selected.", settings);
+    } catch (e) {
+      console.error("XFC ERROR: Failed to init status tab", e);
     }
+  }
 
-    toggleBtn.addEventListener('click', () => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0] && tabs[0].id) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: "TOGGLE_SIDEBAR" }, (response) => {
-                    // This handles a potential error if the content script isn't injected.
-                    if (chrome.runtime.lastError) {
-                        console.log("Could not send message to content script.");
-                    }
-                });
-                window.close(); // Close the popup immediately
-            }
-        });
+  profileSelect.onchange = () => {
+    log(
+      `Status Tab: Profile changed to index ${profileSelect.value}. Saving...`
+    );
+    chrome.storage.sync.set({ activeProfileIndex: profileSelect.value });
+  };
+
+  toggleBtn.onclick = () => {
+    log("Status Tab: Toggle Sidebar button clicked.");
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "TOGGLE_SIDEBAR" });
+        window.close();
+      }
+    });
+  };
+
+  // --- Tab 2: Stored Notes ---
+  const clientSelect = document.getElementById("client-select");
+  const notesTextarea = document.getElementById("stored-notes-textarea");
+  const copyNotesBtn = document.getElementById("copy-notes-btn");
+
+  async function initNotesTab() {
+    log("Notes Tab: Initializing...");
+    const allItems = await chrome.storage.local.get(null);
+    log("Notes Tab: All items from local storage:", allItems);
+    const clientKeys = Object.keys(allItems).filter((key) =>
+      key.startsWith("collectedFields_")
+    );
+    log(`Notes Tab: Found ${clientKeys.length} client data keys.`, clientKeys);
+
+    clientSelect.innerHTML = clientKeys.length
+      ? ""
+      : '<option value="">-- No clients found --</option>';
+    clientKeys.forEach((key) => {
+      const clientName = key.replace("collectedFields_", "").replace(/_/g, " ");
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent =
+        clientName === "default" ? "Default (No Client)" : clientName;
+      clientSelect.appendChild(option);
     });
 
-    // --- "Stored Notes" Tab Logic ---
-    const clientSelect = document.getElementById('client-select');
-    const notesTextarea = document.getElementById('stored-notes-textarea');
-    const copyNotesBtn = document.getElementById('copy-notes-btn');
+    clientSelect.onchange = () =>
+      displayNotesForKey(clientSelect.value, allItems);
+    copyNotesBtn.onclick = () => {
+      navigator.clipboard.writeText(notesTextarea.value);
+    };
 
-    async function populateStoredNotes() {
-        const allItems = await chrome.storage.local.get(null);
-        const clientKeys = Object.keys(allItems).filter(key => key.startsWith('collectedFields_'));
-        
-        clientSelect.innerHTML = '';
-        if (clientKeys.length === 0) {
-            clientSelect.innerHTML = '<option value="">-- No clients found --</option>';
+    log("Notes Tab: Asking content script for its active client key...");
+    const [tab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    });
+    if (tab?.id) {
+      chrome.tabs.sendMessage(
+        tab.id,
+        { type: "GET_ACTIVE_CLIENT_KEY" },
+        (res) => {
+          if (chrome.runtime.lastError) {
+            log(
+              "Notes Tab: Could not get active key. Content script might not be running on this page.",
+              chrome.runtime.lastError.message
+            );
             return;
+          }
+          log("Notes Tab: Received response from content script:", res);
+          if (res?.activeKey && clientKeys.includes(res.activeKey)) {
+            log(`Notes Tab: Pre-selecting client: ${res.activeKey}`);
+            clientSelect.value = res.activeKey;
+            displayNotesForKey(res.activeKey, allItems);
+          }
         }
-
-        clientKeys.forEach(key => {
-            const clientName = key.replace('collectedFields_', '').replace(/_/g, ' ');
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = clientName === 'default' ? 'Default (No Client)' : clientName;
-            clientSelect.appendChild(option);
-        });
-
-        clientSelect.addEventListener('change', () => displayNotesForKey(clientSelect.value, allItems));
-        copyNotesBtn.addEventListener('click', () => {
-             navigator.clipboard.writeText(notesTextarea.value).then(() => {
-                copyNotesBtn.textContent = 'Copied!';
-                setTimeout(() => { copyNotesBtn.textContent = 'Copy Notes'; }, 2000);
-            });
-        });
-
-        const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (activeTab && activeTab.id) {
-            chrome.tabs.sendMessage(activeTab.id, { type: "GET_ACTIVE_CLIENT_KEY" }, (response) => {
-                if (response && response.activeKey) {
-                    clientSelect.value = response.activeKey;
-                    displayNotesForKey(response.activeKey, allItems);
-                } else if (clientKeys.length > 0) {
-                    // Fallback to first client if no response
-                    clientSelect.value = clientKeys[0];
-                    displayNotesForKey(clientKeys[0], allItems);
-                }
-            });
-        }
+      );
     }
+  }
 
-    function displayNotesForKey(selectedKey, allItems) {
-        if (selectedKey) {
-            const clientData = allItems[selectedKey] || [];
-            let formattedBody = '';
-            let currentPage = null;
-            clientData.forEach(field => {
-                if (field.pageTitle !== currentPage) {
-                    if (currentPage !== null) formattedBody += '\n';
-                    formattedBody += `${field.pageTitle}\n`;
-                    currentPage = field.pageTitle;
-                }
-                formattedBody += `- ${field.label}: ${field.value}\n`;
-            });
-            notesTextarea.value = formattedBody.trim();
-            copyNotesBtn.disabled = false;
-        } else {
-            notesTextarea.value = 'Select a client to view their notes.';
-            copyNotesBtn.disabled = true;
-        }
+  function displayNotesForKey(key, allItems) {
+    log(`Notes Tab: Displaying notes for key: ${key}`);
+    const data = allItems[key] || [];
+    let body = "";
+    data.forEach((field) => {
+      body += `${field.pageTitle}\n- ${field.label}: ${field.value}\n  Query: ${field.question}\n\n`;
+    });
+    notesTextarea.value = body.trim();
+    copyNotesBtn.disabled = !body;
+  }
+
+  // --- Tab 3: Custom Questions Viewer ---
+  async function initQuestionsTab() {
+    log("Questions Tab: Initializing...");
+    const { masterQuestionList = {} } = await chrome.storage.sync.get(
+      "masterQuestionList"
+    );
+    const questionViewer = document.getElementById("question-viewer");
+    log(
+      "Questions Tab: Loaded masterQuestionList from sync storage:",
+      masterQuestionList
+    );
+
+    if (Object.keys(masterQuestionList).length > 0) {
+      questionViewer.textContent = JSON.stringify(masterQuestionList, null, 2);
+    } else {
+      questionViewer.textContent =
+        "No custom questions defined. Use the main Options Page to add some.";
     }
-    
-    // --- Initialize both tabs when the popup opens ---
-    updateStatus();
-    populateStoredNotes();
+  }
+
+  // --- Initialize All Tabs ---
+  initStatusTab();
+  initNotesTab();
+  initQuestionsTab();
 });

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Collector Options</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <h1>Form Collector - Custom Questions</h1>
+    <div class="instructions">
+        <strong>Manage Custom Questions:</strong>
+        <p>Questions added here will override the built-in defaults. You can upload a CSV file or add rules manually.</p>
+    </div>
+
+    <h2>Upload from CSV</h2>
+    <div class="upload-section">
+        <label for="csv-upload">Upload a CSV file (must have <code>Label,Question</code> headers):</label>
+        <input type="file" id="csv-upload" accept=".csv">
+        <span id="upload-status"></span>
+    </div>
+
+    <hr>
+    
+    <h2>Current Custom Rules</h2>
+    <div id="question-editor"></div>
+    <div class="button-container">
+        <button id="add-question-rule-btn">Add New Rule</button>
+        <button id="save-questions-btn">Save All Changes</button>
+    </div>
+    <div id="save-status"></div>
+
+    <!-- Modal for adding a new rule -->
+    <div id="add-rule-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3>Add a New Question Rule</h3>
+            <div class="modal-body">
+                <label>Select a Field from the Active Page (if available):</label>
+                <select id="field-label-select"><option value="">-- No labels found --</option></select>
+                <label>Or, enter a new Field Label manually:</label>
+                <input type="text" id="manual-label-input" placeholder="e.g., Main salary and wage occupation">
+                <hr>
+                <p>Enter the questions for this field:</p>
+                <div id="new-questions-container">
+                    <input type="text" class="question-input" placeholder="Question 1">
+                </div>
+                <button id="add-another-question-btn">+</button>
+            </div>
+            <div class="modal-footer">
+                <button id="save-new-rule-btn">Save Rule</button>
+                <button id="cancel-new-rule-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <script src="options.js"></script>
+</body>
+</html>

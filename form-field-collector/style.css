@@ -1,7 +1,5 @@
-/* style.css (FINAL, HYPER-SPECIFIC VERSION) */
-
-/* Target our button with maximum specificity to override Xero's styles */
-button.form-field-collector-btn[data-ffc-label] {
+/* Hyper-specific selector to guarantee styles are applied */
+body.ffc-active-page button.form-field-collector-btn {
     position: absolute !important;
     right: -30px !important; 
     top: 50% !important;
@@ -25,20 +23,9 @@ button.form-field-collector-btn[data-ffc-label] {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    transition: background-color 0.2s, transform 0.2s !important;
+    transition: background-color 0.2s !important;
 }
-
-button.form-field-collector-btn[data-ffc-label]:hover {
-    background-color: #005a9e !important;
-    transform: translateY(-50%) scale(1.1) !important;
-}
-
-/* Red checkmark style */
-button.form-field-collector-btn[data-ffc-label].collected {
+body.ffc-active-page button.form-field-collector-btn.collected {
     background-color: #e74c3c !important; 
     font-size: 16px !important;
-}
-
-button.form-field-collector-btn[data-ffc-label].collected:hover {
-    background-color: #c0392b !important;
 }

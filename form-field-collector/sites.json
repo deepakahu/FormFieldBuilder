@@ -1,39 +1,32 @@
 [
   {
-    "name": "Xero Tax Return Form",
-    "matchPatterns": ["https://autax.xero.com/*"],
+    "name": "Xero Tax Return Form (Unified)",
+    "matchPatterns": [
+      "https://autax.xero.com/Tax/Return/*"
+    ],
     "selectors": {
-      "pageTitle": "span.dfPgT.xui-text-emphasis",
-      "fieldLabel": "span.questionText, [data-type='questionheading']",
-      "fieldContainer": ".question.LPitW",
-      "valueContainer": ".Eo7X2",
-      "clientName": "a.xui-text-decoration-none.xui-margin-left-large"
+      "pageTitle": ".page-title, span.dfPgT.xui-text-emphasis",
+      "fieldLabel": ".q-text, .questionText, [data-type='questionheading']",
+      "fieldContainer": ".questionContainer",
+      "clientName": ".xui-pageheader-context, a.xui-text-decoration-none.xui-margin-left-large",
+      "value": "input, .xui-picklist--button, .xui-select--control, .currency-input__display-value, .mnIQk"
     },
     "defaultQuestions": {
-      "default": ["Please verify this information."],
+      "default": [
+        "Please verify this information."
+      ],
       "Main salary and wage occupation": [
         "Is this the primary occupation for the client?",
-        "Please confirm if this occupation code is correct."
+        "Please confirm if this occupation code is correct for the financial year."
       ],
       "Salary or wages": [
         "Does this amount match the final payslip/income statement?",
-        "Please provide the income statement for this amount."
+        "Please provide the ATO pre-fill report or income statement for this amount."
       ],
       "Payer's name": [
         "Is this the correct legal name of the employer?",
-        "Please provide the ABN for this payer."
+        "Please provide the ABN for this payer if available."
       ]
-    }
-  },
-  {
-    "name": "Xero Practice Manager (Example)",
-    "matchPatterns": ["https://practicemanager.xero.com/*"],
-    "selectors": {
-      "pageTitle": ".title",
-      "fieldLabel": ".job-info-label",
-      "fieldContainer": ".job-info-row",
-      "valueContainer": ".job-info-value",
-      "clientName": ".client-name-header"
     }
   },
   {

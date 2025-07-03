@@ -9,18 +9,21 @@
         <div class="tab-header">
             <button class="tab-link active" data-tab="status-tab">Status</button>
             <button class="tab-link" data-tab="notes-tab">Stored Notes</button>
+            <button class="tab-link" data-tab="questions-tab">Custom Questions</button>
         </div>
 
         <!-- Status Tab Content -->
         <div id="status-tab" class="tab-content active">
-            <h1>Xero Form Collector</h1>
-            <div id="status-display">
-                <p>Loading status...</p>
+            <h1>Form Collector</h1>
+            <div class="settings-row">
+                <label for="profile-select">Active Profile:</label>
+                <select id="profile-select"></select>
             </div>
             <hr>
             <div class="actions">
                 <button id="toggle-sidebar-btn">Toggle Sidebar</button>
             </div>
+            <p class="help-text">Use the <a href="#" id="options-link">Options Page</a> to upload/edit questions.</p>
         </div>
 
         <!-- Stored Notes Tab Content -->
@@ -28,14 +31,19 @@
             <h1>Stored Notes</h1>
             <div class="notes-controls">
                 <label for="client-select">Select a Client:</label>
-                <select id="client-select">
-                    <option value="">-- No clients found --</option>
-                </select>
+                <select id="client-select"></select>
             </div>
-            <textarea id="stored-notes-textarea" readonly placeholder="Select a client to view their notes."></textarea>
+            <textarea id="stored-notes-textarea" readonly></textarea>
             <div class="actions">
                 <button id="copy-notes-btn" disabled>Copy Notes</button>
             </div>
+        </div>
+        
+        <!-- Custom Questions Tab Content -->
+        <div id="questions-tab" class="tab-content">
+            <h1>Custom Questions</h1>
+            <p class="help-text">This is a read-only view. Use the <a href="#" id="options-link-2">main Options Page</a> to manage rules.</p>
+            <div id="question-viewer"></div>
         </div>
     </div>
     <script src="popup.js"></script>

@@ -13,21 +13,21 @@ chrome.runtime.onInstalled.addListener(() => {
       if (data.masterQuestionList === undefined) {
         // The user has no custom questions yet, so we store an empty object.
         chrome.storage.sync.set({ masterQuestionList: {} });
-        console.log("Initialized empty custom question list.");
+        //console.log("Initialized empty custom question list.");
       }
 
       if (data.activeProfileIndex === undefined) {
         // Set the default active profile to the first one in sites.json (Xero Tax Return Form).
         chrome.storage.sync.set({ activeProfileIndex: 0 });
-        console.log("Set default active profile to index 0.");
+        //console.log("Set default active profile to index 0.");
       }
 
       if (data.debugMode === undefined) {
         // Debug mode is off by default for production.
-        chrome.storage.sync.set({ debugMode: true });
+        chrome.storage.sync.set({ debugMode: false });
       }
     }
   );
 
-  console.log('Xero Form Collector has been installed and defaults are set.');
+  //console.log('Xero Form Collector has been installed and defaults are set.');
 });

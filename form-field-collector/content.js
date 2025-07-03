@@ -3,7 +3,7 @@
 // =========================================================================
 
 // --- GLOBALS ---
-let DEBUG_MODE = true; // Force debug mode for this session
+let DEBUG_MODE = false; // Force debug mode for this session
 const log = (...args) => {
   if (DEBUG_MODE) console.log("XFC DEBUG [Content]:", ...args);
 };
@@ -25,7 +25,7 @@ async function initialize() {
     debugMode: false,
     activeProfileIndex: 0,
   });
-  DEBUG_MODE = settings.debugMode || true; // Keep it on for this test
+  DEBUG_MODE = settings.debugMode || false; // Keep it on for this test
   log("1. Settings loaded from sync storage:", settings);
 
   document.body.classList.add("ffc-active-page");

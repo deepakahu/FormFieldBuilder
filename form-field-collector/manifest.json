@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "Xero Form Collector",
-  "version": "7.0.0",
+  "version": "1.0.0",
   "description": "A configurable tool to collect form fields and attach standard queries for review.",
-  "permissions": [ "storage", "activeTab", "scripting" ],
+  "permissions": [ "storage", "activeTab" ],
   "host_permissions": [ "https://*.xero.com/*" ],
   "background": { "service_worker": "background.js" },
   "action": {

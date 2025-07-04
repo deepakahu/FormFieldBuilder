@@ -234,8 +234,24 @@ function openQuestionPicker(clickedButton, labelElement, labelText) {
 
       // 4. Manually trigger the UI updates NOW
       log("Manually updating sidebar text and button states...");
-      updateSidebarText();
-      updateAllButtonStates();
+      //updateSidebarText();
+      //updateAllButtonStates();
+
+      // ----------- THIS IS THE FIX -----------
+      // Before calling any chrome API, check if the runtime context is still valid.
+      // chrome.runtime.id will be undefined if the context is invalidated.
+      if (chrome.runtime?.id) {
+          // 3. Start saving to storage (asynchronously)
+          chrome.storage.local.set({ [dynamicStorageKey]: collectedFieldsCache });
+
+          // 4. Manually trigger the UI updates NOW
+          updateSidebarText();
+          updateAllButtonStates();
+      } else {
+          // The context was lost (e.g., user navigated away while the picker was open).
+          // We can't use the API, so we do nothing to avoid the error.
+          console.log("XFC: Context invalidated, skipping storage update.");
+      }
       // ---------------------------------------------
       
       closePicker();
